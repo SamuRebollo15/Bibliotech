@@ -37,39 +37,40 @@
 
             <div class="flex items-center gap-4">
                 @auth
-                    <span class="text-[#1e3a8a] font-semibold">
-                        {{ Auth::user()->name }}
-                    </span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition shadow">
-                            Cerrar sesión
-                        </button>
-                    </form>
+                <a href="{{ route('cuenta.index') }}" class="text-[#1e3a8a] font-semibold hover:underline hover:text-[#3b82f6] transition">
+                    {{ Auth::user()->name }}
+                </a>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition shadow">
+                        Cerrar sesión
+                    </button>
+                </form>
                 @else
-                    <a href="{{ route('login') }}"
-                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition shadow">
-                        Iniciar sesión
-                    </a>
-                    <a href="{{ route('register') }}"
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition shadow">
-                        Registrarse
-                    </a>
+                <a href="{{ route('login') }}"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition shadow">
+                    Iniciar sesión
+                </a>
+                <a href="{{ route('register') }}"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition shadow">
+                    Registrarse
+                </a>
                 @endauth
             </div>
         </div>
 
         {{-- Botón para añadir nuevo libro (solo admin) --}}
         @auth
-            @if(Auth::user()->esAdmin())
-            <div class="flex justify-end mb-4">
-                <a href="{{ route('libros.create') }}"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                    ➕ Añadir nuevo libro
-                </a>
-            </div>
-            @endif
+        @if(Auth::user()->esAdmin())
+        <div class="flex justify-end mb-4">
+            <a href="{{ route('libros.create') }}"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                ➕ Añadir nuevo libro
+            </a>
+        </div>
+        @endif
         @endauth
 
         {{-- Tabla de libros --}}
@@ -105,20 +106,20 @@
                             </a>
 
                             @auth
-                                @if(Auth::user()->esAdmin())
-                                {{-- Editar --}}
-                                <a href="{{ route('libros.edit', $libro->id) }}"
-                                    class="bg-yellow-500 text-white text-sm px-3 py-1 rounded hover:bg-yellow-600 transition">
-                                    Editar
-                                </a>
+                            @if(Auth::user()->esAdmin())
+                            {{-- Editar --}}
+                            <a href="{{ route('libros.edit', $libro->id) }}"
+                                class="bg-yellow-500 text-white text-sm px-3 py-1 rounded hover:bg-yellow-600 transition">
+                                Editar
+                            </a>
 
-                                {{-- Eliminar (abre modal) --}}
-                                <button type="button"
-                                    onclick="openModal({{ $libro->id }})"
-                                    class="bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700 transition">
-                                    Eliminar
-                                </button>
-                                @endif
+                            {{-- Eliminar (abre modal) --}}
+                            <button type="button"
+                                onclick="openModal({{ $libro->id }})"
+                                class="bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700 transition">
+                                Eliminar
+                            </button>
+                            @endif
                             @endauth
                         </td>
                     </tr>

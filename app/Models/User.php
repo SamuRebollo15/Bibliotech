@@ -26,13 +26,16 @@ class User extends Authenticatable
 
     // Relación: un usuario puede tener muchos préstamos
     public function prestamos()
-    {
-        return $this->hasMany(Prestamo::class, 'user_id'); // Cambiar si el campo en la tabla es diferente
-    }
+{
+    return $this->hasMany(Prestamo::class, 'user_id');
+}
+
 
     // Método para verificar si el usuario es administrador
     public function esAdmin(): bool
     {
         return $this->rol === 'admin';
     }
+    
+    
 }

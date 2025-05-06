@@ -6,6 +6,7 @@ use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CuentaController; // ✅ Controlador nuevo para la vista de cuenta
 use App\Http\Middleware\EsAdmin;
 
 // Página principal: lista de libros (acceso público)
@@ -35,6 +36,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Vista general de cuenta (tarjetas de opciones)
+    Route::get('/cuenta', [CuentaController::class, 'index'])->middleware(['auth'])->name('cuenta.index');
+
+
+    // Vista específica de préstamos activos
+    Route::get('/cuenta/prestamos', [CuentaController::class, 'prestamos'])->middleware(['auth'])->name('cuenta.prestamos');
+
 });
 
 // Rutas solo para administradores
@@ -49,5 +58,5 @@ Route::middleware(['auth', EsAdmin::class])->group(function () {
     Route::resource('usuarios', UsuarioController::class)->except(['show']);
 });
 
-// Rutas Breeze
+// Rutas Breeze (login, register, etc.)
 require __DIR__ . '/auth.php';
