@@ -20,17 +20,37 @@
         {{-- Tarjetas de opciones --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {{-- Ver préstamos activos --}}
-            <div class="bg-white rounded-lg shadow-md p-6 border hover:shadow-lg transition">
-                <h2 class="text-lg font-bold text-[#1e3a8a] mb-2">📚 Ver préstamos activos</h2>
-                <p class="text-sm text-gray-600 mb-4">Consulta los libros que tienes actualmente en préstamo.</p>
-                <a href="{{ route('prestamos.index') }}"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                    Acceder
-                </a>
-            </div>
+            @if(Auth::user()->esAdmin())
+                {{-- 🔒 Opciones exclusivas para administradores --}}
 
-            {{-- Editar perfil --}}
+                {{-- Gestionar préstamos --}}
+                <div class="bg-white rounded-lg shadow-md p-6 border hover:shadow-lg transition">
+                    <h2 class="text-lg font-bold text-[#1e3a8a] mb-2">📋 Gestión de préstamos</h2>
+                    <p class="text-sm text-gray-600 mb-4">Consulta y administra todos los préstamos del sistema.</p>
+                    <a href="{{ route('admin.prestamos.gestion') }}"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        Acceder
+                    </a>
+                </div>
+
+                {{-- Gestión de usuarios (puedes añadir más aquí en el futuro) --}}
+                {{-- ... --}}
+            
+            @else
+                {{-- 👤 Opciones para usuarios lectores --}}
+
+                {{-- Ver préstamos activos --}}
+                <div class="bg-white rounded-lg shadow-md p-6 border hover:shadow-lg transition">
+                    <h2 class="text-lg font-bold text-[#1e3a8a] mb-2">📚 Ver préstamos activos</h2>
+                    <p class="text-sm text-gray-600 mb-4">Consulta los libros que tienes actualmente en préstamo.</p>
+                    <a href="{{ route('prestamos.index') }}"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        Acceder
+                    </a>
+                </div>
+            @endif
+
+            {{-- Editar perfil (común para ambos roles) --}}
             <div class="bg-white rounded-lg shadow-md p-6 border hover:shadow-lg transition">
                 <h2 class="text-lg font-bold text-[#1e3a8a] mb-2">⚙️ Editar perfil</h2>
                 <p class="text-sm text-gray-600 mb-4">Modifica tu nombre, correo o contraseña.</p>

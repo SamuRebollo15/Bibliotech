@@ -43,7 +43,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Vista específica de préstamos activos
     Route::get('/cuenta/prestamos', [CuentaController::class, 'prestamos'])->middleware(['auth'])->name('cuenta.prestamos');
-
 });
 
 // Rutas solo para administradores
@@ -56,6 +55,10 @@ Route::middleware(['auth', EsAdmin::class])->group(function () {
 
     // Gestión de usuarios (solo desde admin)
     Route::resource('usuarios', UsuarioController::class)->except(['show']);
+    
+    Route::get('/admin/prestamos', [PrestamoController::class, 'gestion'])->name('admin.prestamos.gestion');
+    Route::patch('/admin/prestamos/{prestamo}', [PrestamoController::class, 'actualizarEstado'])->name('admin.prestamos.actualizar');
+    
 });
 
 // Rutas Breeze (login, register, etc.)

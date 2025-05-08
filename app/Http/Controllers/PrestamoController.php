@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class PrestamoController extends Controller
 {
-    /**
-     * Mostrar los préstamos del usuario autenticado.
-     */
     public function index()
     {
         $prestamos = Prestamo::with('libro')
@@ -22,17 +19,11 @@ class PrestamoController extends Controller
         return view('prestamos.index', compact('prestamos'));
     }
 
-    /**
-     * Mostrar formulario para crear un préstamo (opcional).
-     */
     public function create()
     {
         return redirect()->route('libros.index');
     }
 
-    /**
-     * Guardar un nuevo préstamo rápido (sin fechas).
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -58,8 +49,49 @@ class PrestamoController extends Controller
     }
 
     /**
-     * Mostrar detalles de un préstamo (opcional).
+     * Vista de gestión para administradores con todos los préstamos del sistema.
      */
+    public function gestion()
+{
+    // Solo accesible si el usuario es administrador
+    if (!Auth::user()->esAdmin()) {
+        abort(403);
+    }
+
+    $prestamos = Prestamo::with(['libro', 'usuario'])
+        ->orderByDesc('fecha_inicio')
+        ->get();
+
+    return view('prestamos.gestion', compact('prestamos'));
+}
+
+
+    /**
+     * Permite al administrador cambiar el estado de un préstamo.
+     */
+    public function actualizarEstado(Request $request, Prestamo $prestamo)
+{
+    if (!Auth::user()->esAdmin()) {
+        abort(403);
+    }
+
+    $request->validate([
+        'estado' => 'required|in:activo,devuelto',
+    ]);
+
+    $prestamo->estado = $request->estado;
+
+    if ($request->estado === 'devuelto') {
+        $prestamo->fecha_fin = now();
+        $prestamo->libro->update(['estado' => 'disponible']);
+    }
+
+    $prestamo->save();
+
+    return redirect()->route('admin.prestamos.gestion')->with('success', 'Estado del préstamo actualizado.');
+}
+
+
     public function show(Prestamo $prestamo)
     {
         if ($prestamo->user_id !== Auth::id()) {
@@ -69,17 +101,11 @@ class PrestamoController extends Controller
         return view('prestamos.show', compact('prestamo'));
     }
 
-    /**
-     * Mostrar formulario para editar (no necesario).
-     */
     public function edit(Prestamo $prestamo)
     {
         return redirect()->route('prestamos.index');
     }
 
-    /**
-     * Actualizar préstamo (ej: marcar como devuelto).
-     */
     public function update(Request $request, Prestamo $prestamo)
     {
         if ($prestamo->user_id !== Auth::id()) {
@@ -96,9 +122,6 @@ class PrestamoController extends Controller
         return redirect()->route('prestamos.index')->with('success', 'Libro devuelto correctamente.');
     }
 
-    /**
-     * Eliminar un préstamo (opcional, si se permite cancelar).
-     */
     public function destroy(Prestamo $prestamo)
     {
         if ($prestamo->user_id !== Auth::id()) {
@@ -114,9 +137,6 @@ class PrestamoController extends Controller
         return redirect()->route('prestamos.index')->with('success', 'Préstamo cancelado correctamente.');
     }
 
-    /**
-     * Mostrar formulario para préstamo manual con fechas.
-     */
     public function formulario(Libro $libro)
     {
         if ($libro->estado !== 'disponible') {
@@ -126,9 +146,6 @@ class PrestamoController extends Controller
         return view('prestamos.formulario', compact('libro'));
     }
 
-    /**
-     * Procesar formulario de préstamo con fechas.
-     */
     public function realizar(Request $request, Libro $libro)
     {
         $request->validate([
