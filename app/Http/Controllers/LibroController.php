@@ -11,11 +11,24 @@ class LibroController extends Controller
     /**
      * Mostrar todos los libros.
      */
-    public function index()
-    {
-        $libros = Libro::with('categoria')->get();
-        return view('libros.index', compact('libros'));
+  public function index(Request $request)
+{
+    $query = Libro::query();
+
+    if ($request->filled('busqueda')) {
+        $busqueda = $request->input('busqueda');
+        $query->where(function ($q) use ($busqueda) {
+            $q->where('titulo', 'like', "%{$busqueda}%")
+              ->orWhere('autor', 'like', "%{$busqueda}%");
+        });
     }
+
+    $libros = $query->with('categoria')->get();
+
+    return view('libros.index', compact('libros'));
+}
+
+
 
     /**
      * Mostrar formulario para crear un nuevo libro.

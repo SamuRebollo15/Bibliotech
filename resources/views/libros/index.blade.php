@@ -72,6 +72,24 @@
         </div>
         @endif
         @endauth
+        {{-- Buscador unificado por título o autor --}}
+<form method="GET" action="{{ route('libros.index') }}" class="mb-6 bg-white p-4 rounded shadow border border-gray-200">
+    <div class="flex items-center gap-4">
+        <input type="text" name="busqueda" placeholder="Buscar por título o autor" value="{{ request('busqueda') }}"
+            class="flex-grow px-4 py-2 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+
+        <button type="submit"
+            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+            Buscar
+        </button>
+
+        @if(request('busqueda'))
+        <a href="{{ route('libros.index') }}" class="text-red-600 underline text-sm hover:text-red-800">
+            Limpiar
+        </a>
+        @endif
+    </div>
+</form>
 
         {{-- Tabla de libros --}}
         <div class="bg-white shadow rounded-lg overflow-hidden border border-gray-200">
