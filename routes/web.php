@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
     // Vista general de cuenta (tarjetas de opciones)
     Route::get('/cuenta', [CuentaController::class, 'index'])->middleware(['auth'])->name('cuenta.index');
 
+   Route::patch('/prestamos/{prestamo}/prorrogar', [PrestamoController::class, 'prorrogar'])->name('prestamos.prorrogar');
+
 
     // Vista específica de préstamos activos
     Route::get('/cuenta/prestamos', [CuentaController::class, 'prestamos'])->middleware(['auth'])->name('cuenta.prestamos');

@@ -55,16 +55,30 @@
                             <span class="text-gray-600">{{ $prestamo->estado }}</span>
                             @endif
                         </td>
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-3 px-4 text-center space-y-1">
                             @if($prestamo->estado === 'activo')
+                            {{-- Botón cancelar con modal --}}
                             <button onclick="abrirModal({{ $prestamo->id }})"
                                 class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">
                                 Cancelar
                             </button>
+
+                            {{-- Botón prorrogar --}}
+                            @if($prestamo->puedeSerProrrogado())
+                            <form action="{{ route('prestamos.prorrogar', $prestamo->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                    class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm transition">
+                                    Prorrogar +7 días
+                                </button>
+                            </form>
+                            @endif
                             @else
                             <span class="text-gray-400 text-sm">No disponible</span>
                             @endif
                         </td>
+
                     </tr>
                     @empty
                     <tr>
@@ -122,4 +136,5 @@
     </script>
 
 </body>
+
 </html>
