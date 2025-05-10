@@ -51,19 +51,38 @@ class PrestamoController extends Controller
     /**
      * Vista de gestión para administradores con todos los préstamos del sistema.
      */
-    public function gestion()
+   public function gestion(Request $request)
 {
-    // Solo accesible si el usuario es administrador
     if (!Auth::user()->esAdmin()) {
         abort(403);
     }
 
-    $prestamos = Prestamo::with(['libro', 'usuario'])
-        ->orderByDesc('fecha_inicio')
-        ->get();
+    // Obtener el ID del usuario si se está filtrando
+    $usuarioId = $request->input('usuario_id');
 
-    return view('prestamos.gestion', compact('prestamos'));
+    // Base query con relaciones
+    $query = Prestamo::with(['libro', 'usuario'])->orderByDesc('fecha_inicio');
+
+    if ($usuarioId) {
+        $query->where('user_id', $usuarioId);
+    }
+
+    // Clonar la query para obtener por separado activos y devueltos
+    $prestamosActivos = (clone $query)->where('estado', 'activo')->get();
+    $prestamosDevueltos = (clone $query)->where('estado', 'devuelto')->get();
+
+    // Lista de usuarios para el filtro
+    $usuarios = \App\Models\User::orderBy('name')->get();
+
+    return view('prestamos.gestion', compact(
+        'prestamosActivos',
+        'prestamosDevueltos',
+        'usuarios',
+        'usuarioId'
+    ));
 }
+
+
 
 
     /**
@@ -138,35 +157,47 @@ class PrestamoController extends Controller
     }
 
     public function formulario(Libro $libro)
-    {
-        if ($libro->estado !== 'disponible') {
-            return redirect()->route('libros.index')->with('error', 'Este libro no está disponible para préstamo.');
-        }
-
-        return view('prestamos.formulario', compact('libro'));
+{
+    // 🚫 Bloquear acceso si el usuario está bloqueado
+    if (Auth::user()->bloqueado) {
+        return redirect()->route('libros.index')->with('error', 'No puedes solicitar préstamos porque tu cuenta está bloqueada.');
     }
+
+    if ($libro->estado !== 'disponible') {
+        return redirect()->route('libros.index')->with('error', 'Este libro no está disponible para préstamo.');
+    }
+
+    return view('prestamos.formulario', compact('libro'));
+}
+
 
     public function realizar(Request $request, Libro $libro)
-    {
-        $request->validate([
-            'fecha_inicio' => 'required|date|after_or_equal:today',
-            'fecha_fin' => 'required|date|after:fecha_inicio',
-        ]);
-
-        if ($libro->estado !== 'disponible') {
-            return redirect()->route('libros.index')->with('error', 'Este libro no está disponible.');
-        }
-
-        Prestamo::create([
-            'user_id' => Auth::id(),
-            'libro_id' => $libro->id,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin' => $request->fecha_fin,
-            'estado' => 'activo',
-        ]);
-
-        $libro->update(['estado' => 'prestado']);
-
-        return redirect()->route('libros.index')->with('success', 'El préstamo ha sido registrado correctamente.');
+{
+    // 🚫 Verificar si el usuario está bloqueado
+    if (Auth::user()->bloqueado) {
+        return redirect()->route('libros.index')->with('error', 'No puedes alquilar libros porque tu cuenta está bloqueada.');
     }
+
+    $request->validate([
+        'fecha_inicio' => 'required|date|after_or_equal:today',
+        'fecha_fin' => 'required|date|after:fecha_inicio',
+    ]);
+    
+    if ($libro->estado !== 'disponible') {
+        return redirect()->route('libros.index')->with('error', 'Este libro no está disponible.');
+    }
+
+    Prestamo::create([
+        'user_id' => Auth::id(),
+        'libro_id' => $libro->id,
+        'fecha_inicio' => $request->fecha_inicio,
+        'fecha_fin' => $request->fecha_fin,
+        'estado' => 'activo',
+    ]);
+
+    $libro->update(['estado' => 'prestado']);
+
+    return redirect()->route('libros.index')->with('success', 'El préstamo ha sido registrado correctamente.');
+}
+
 }

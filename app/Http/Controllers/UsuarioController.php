@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
@@ -12,7 +12,7 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarios = Usuario::all();
+        $usuarios = User::all();
         return view('usuarios.index', compact('usuarios'));
     }
 
@@ -30,34 +30,27 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'correo' => 'required|email|unique:usuarios',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'rol' => 'required|in:admin,lector',
         ]);
 
-        Usuario::create([
-            'nombre' => $request->nombre,
-            'correo' => $request->correo,
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => bcrypt($request->password),
             'rol' => $request->rol,
+            'bloqueado' => false,
         ]);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
 
     /**
-     * Mostrar un usuario (opcional).
-     */
-    public function show(Usuario $usuario)
-    {
-        return view('usuarios.show', compact('usuario'));
-    }
-
-    /**
      * Mostrar formulario de edición.
      */
-    public function edit(Usuario $usuario)
+    public function edit(User $usuario)
     {
         return view('usuarios.edit', compact('usuario'));
     }
@@ -65,17 +58,17 @@ class UsuarioController extends Controller
     /**
      * Actualizar un usuario.
      */
-    public function update(Request $request, Usuario $usuario)
+    public function update(Request $request, User $usuario)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'correo' => 'required|email|unique:usuarios,correo,' . $usuario->id,
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $usuario->id,
             'rol' => 'required|in:admin,lector',
         ]);
 
         $usuario->update([
-            'nombre' => $request->nombre,
-            'correo' => $request->correo,
+            'name' => $request->name,
+            'email' => $request->email,
             'rol' => $request->rol,
         ]);
 
@@ -85,9 +78,37 @@ class UsuarioController extends Controller
     /**
      * Eliminar un usuario.
      */
-    public function destroy(Usuario $usuario)
+    public function destroy(User $usuario)
     {
         $usuario->delete();
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
+
+    /**
+     * Bloquear un usuario (no puede alquilar libros).
+     */
+    public function bloquear(User $user)
+{
+    if ($user->esAdmin()) {
+        return back()->with('error', 'No puedes bloquear a un administrador.');
+    }
+
+    $user->bloqueado = true;
+    $user->save();
+
+    return back()->with('success', 'Usuario bloqueado correctamente.');
+}
+
+
+    /**
+     * Desbloquear un usuario.
+     */
+    public function desbloquear(User $user)
+{
+    $user->bloqueado = false;
+    $user->save();
+
+    return back()->with('success', 'Usuario desbloqueado correctamente.');
+}
+
 }

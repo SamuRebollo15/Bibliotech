@@ -55,10 +55,12 @@ Route::middleware(['auth', EsAdmin::class])->group(function () {
 
     // Gestión de usuarios (solo desde admin)
     Route::resource('usuarios', UsuarioController::class)->except(['show']);
-    
+
     Route::get('/admin/prestamos', [PrestamoController::class, 'gestion'])->name('admin.prestamos.gestion');
     Route::patch('/admin/prestamos/{prestamo}', [PrestamoController::class, 'actualizarEstado'])->name('admin.prestamos.actualizar');
-    
+    // En rutas de administradores:
+    Route::patch('/admin/usuarios/{user}/bloquear', [UsuarioController::class, 'bloquear'])->name('admin.usuarios.bloquear');
+    Route::patch('/admin/usuarios/{user}/desbloquear', [UsuarioController::class, 'desbloquear'])->name('admin.usuarios.desbloquear');
 });
 
 // Rutas Breeze (login, register, etc.)
