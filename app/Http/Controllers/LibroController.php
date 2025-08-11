@@ -11,6 +11,9 @@ class LibroController extends Controller
     /**
      * Mostrar todos los libros.
      */
+    /**
+     * Muestra todos los libros
+     */
   public function index(Request $request)
 {
     $query = Libro::query();
