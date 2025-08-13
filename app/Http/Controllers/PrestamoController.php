@@ -15,7 +15,14 @@ class PrestamoController extends Controller
         $prestamos = Prestamo::with('libro')
             ->where('user_id', Auth::id())
             ->orderBy('fecha_inicio', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($prestamo) {
+                $inicio = Carbon::parse($prestamo->fecha_inicio);
+                $fin = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
+                $maximaFecha = $inicio->copy()->addDays(14); // 7 originales + 7 prórroga
+                $prestamo->ya_prorrogado = $fin && $fin->greaterThanOrEqualTo($maximaFecha);
+                return $prestamo;
+            });
 
         return view('prestamos.index', compact('prestamos'));
     }
@@ -41,6 +48,7 @@ class PrestamoController extends Controller
             'user_id' => Auth::id(),
             'libro_id' => $libro->id,
             'fecha_inicio' => now(),
+            'fecha_fin' => now()->addDays(7),
             'estado' => 'activo',
         ]);
 
@@ -62,7 +70,14 @@ class PrestamoController extends Controller
             $query->where('user_id', $usuarioId);
         }
 
-        $prestamosActivos = (clone $query)->where('estado', 'activo')->get();
+        $prestamosActivos = (clone $query)->where('estado', 'activo')->get()->map(function ($prestamo) {
+            $inicio = Carbon::parse($prestamo->fecha_inicio);
+            $fin = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
+            $maximaFecha = $inicio->copy()->addDays(14);
+            $prestamo->ya_prorrogado = $fin && $fin->greaterThanOrEqualTo($maximaFecha);
+            return $prestamo;
+        });
+
         $prestamosDevueltos = (clone $query)->where('estado', 'devuelto')->get();
         $usuarios = \App\Models\User::orderBy('name')->get();
 
@@ -151,7 +166,10 @@ class PrestamoController extends Controller
             return redirect()->route('libros.index')->with('error', 'Este libro no está disponible para préstamo.');
         }
 
-        return view('prestamos.formulario', compact('libro'));
+        $fechaRecogida = Carbon::today();
+        $fechaDevolucion = $fechaRecogida->copy()->addDays(7);
+
+        return view('prestamos.formulario', compact('libro', 'fechaRecogida', 'fechaDevolucion'));
     }
 
     public function realizar(Request $request, Libro $libro)
@@ -162,18 +180,20 @@ class PrestamoController extends Controller
 
         $request->validate([
             'fecha_inicio' => 'required|date|after_or_equal:today',
-            'fecha_fin' => 'required|date|after:fecha_inicio',
         ]);
 
         if ($libro->estado !== 'disponible') {
             return redirect()->route('libros.index')->with('error', 'Este libro no está disponible.');
         }
 
+        $fechaInicio = Carbon::parse($request->fecha_inicio);
+        $fechaFin = $fechaInicio->copy()->addDays(7);
+
         Prestamo::create([
             'user_id' => Auth::id(),
             'libro_id' => $libro->id,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin' => $request->fecha_fin,
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin,
             'estado' => 'activo',
         ]);
 
@@ -190,8 +210,7 @@ class PrestamoController extends Controller
 
         $inicio = Carbon::parse($prestamo->fecha_inicio);
         $fin = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
-
-        $maximaFecha = $inicio->copy()->addDays(14); // 7 días originales + 7 prórroga
+        $maximaFecha = $inicio->copy()->addDays(14);
 
         if ($fin && $fin->greaterThanOrEqualTo($maximaFecha)) {
             return back()->with('error', 'No puedes prorrogar este préstamo más de una vez.');

@@ -32,22 +32,58 @@
         <form method="POST" action="{{ route('prestamos.realizar', $libro->id) }}">
             @csrf
 
+            {{-- Fecha de recogida --}}
             <div class="mb-4">
                 <label class="block font-medium mb-1" for="fecha_inicio">📅 Fecha de recogida</label>
-                <input type="date" name="fecha_inicio" id="fecha_inicio" class="w-full border rounded px-3 py-2" required>
+                <input 
+                    type="date" 
+                    name="fecha_inicio" 
+                    id="fecha_inicio" 
+                    class="w-full border rounded px-3 py-2"
+                    value="{{ $fechaRecogida->format('Y-m-d') }}"
+                    min="{{ $fechaRecogida->format('Y-m-d') }}"
+                    required
+                >
             </div>
 
+            {{-- Fecha de devolución (solo lectura) --}}
             <div class="mb-6">
-                <label class="block font-medium mb-1" for="fecha_fin">📅 Fecha de devolución</label>
-                <input type="date" name="fecha_fin" id="fecha_fin" class="w-full border rounded px-3 py-2" required>
+                <label class="block font-medium mb-1">📅 Fecha de devolución</label>
+                <input 
+                    type="date" 
+                    class="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
+                    value="{{ $fechaDevolucion->format('Y-m-d') }}"
+                    readonly
+                >
+                <p class="text-xs text-gray-500 mt-1">
+                    La fecha de devolución se calcula automáticamente (7 días después de la recogida).
+                </p>
             </div>
 
+            {{-- Botones --}}
             <div class="flex justify-between">
-                <a href="{{ route('libros.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</a>
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Confirmar préstamo</button>
+                <a href="{{ route('libros.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                    Cancelar
+                </a>
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Confirmar préstamo
+                </button>
             </div>
         </form>
     </div>
+
+    {{-- Script para actualizar fecha de devolución si cambia la recogida --}}
+    <script>
+        document.getElementById('fecha_inicio').addEventListener('change', function() {
+            let fechaInicio = new Date(this.value);
+            if (!isNaN(fechaInicio)) {
+                let fechaFin = new Date(fechaInicio);
+                fechaFin.setDate(fechaFin.getDate() + 7);
+                let fechaFinStr = fechaFin.toISOString().split('T')[0];
+                document.querySelector('input[readonly]').value = fechaFinStr;
+            }
+        });
+    </script>
 
 </body>
 </html>
