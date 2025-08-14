@@ -14,6 +14,6 @@ class EsAdmin
             return $next($request);
         }
 
-        return redirect()->route('home'); // O la ruta que tú prefieras
+        return redirect()->route('home'); 
     }
 }

@@ -56,7 +56,7 @@
                     readonly
                 >
                 <p class="text-xs text-gray-500 mt-1">
-                    La fecha de devolución se calcula automáticamente (7 días después de la recogida).
+                    La fecha de devolución se calcula automáticamente (25 días después de la recogida).
                 </p>
             </div>
 
@@ -78,7 +78,7 @@
             let fechaInicio = new Date(this.value);
             if (!isNaN(fechaInicio)) {
                 let fechaFin = new Date(fechaInicio);
-                fechaFin.setDate(fechaFin.getDate() + 7);
+                fechaFin.setDate(fechaFin.getDate() + 25); // 25 días en lugar de 7
                 let fechaFinStr = fechaFin.toISOString().split('T')[0];
                 document.querySelector('input[readonly]').value = fechaFinStr;
             }
