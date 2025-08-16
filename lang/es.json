@@ -1,0 +1,22 @@
+{
+    "Cerrar sesión": "Cerrar sesión",
+    "Iniciar sesión": "Iniciar sesión",
+    "Registrarse": "Registrarse",
+    "Añadir nuevo libro": "Añadir nuevo libro",
+    "Buscar por título o autor": "Buscar por título o autor",
+    "Buscar": "Buscar",
+    "Limpiar": "Limpiar",
+    "Título": "Título",
+    "Autor": "Autor",
+    "Estado": "Estado",
+    "Acciones": "Acciones",
+    "Disponible": "Disponible",
+    "Prestado": "Prestado",
+    "Reservado": "Reservado",
+    "Ver": "Ver",
+    "Editar": "Editar",
+    "Eliminar": "Eliminar",
+    "¿Estás seguro?": "¿Estás seguro?",
+    "Esta acción eliminará el libro permanentemente.": "Esta acción eliminará el libro permanentemente.",
+    "Cancelar": "Cancelar"
+}

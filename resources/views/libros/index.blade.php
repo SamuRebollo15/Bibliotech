@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
@@ -28,14 +28,22 @@
 
     <div class="max-w-6xl mx-auto py-8 px-4">
 
-        {{-- Logo + Nombre + Autenticación --}}
+        {{-- Logo + Nombre + Autenticación + Idioma --}}
         <div class="flex items-center justify-between mb-8">
             <div class="flex items-center gap-4">
-                <img src="{{ asset('storage/logo_bibliotech.png') }}" alt="Logo Bibliotech" class="h-16">
+                <img src="{{ asset('storage/logo_bibliotech.png') }}" alt="{{ __('Logo Bibliotech') }}" class="h-16">
                 <h1 class="text-4xl font-extrabold text-[#1e3a8a] tracking-wide">Bibliotech</h1>
             </div>
 
             <div class="flex items-center gap-4">
+                {{-- Botón de idioma --}}
+                <form method="POST" action="{{ route('cambiar.idioma') }}">
+                    @csrf
+                    <button type="submit" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 transition">
+                        🌐 {{ app()->getLocale() === 'es' ? 'English' : 'Español' }}
+                    </button>
+                </form>
+
                 @auth
                 <a href="{{ route('cuenta.index') }}" class="text-[#1e3a8a] font-semibold hover:underline hover:text-[#3b82f6] transition">
                     {{ Auth::user()->name }}
@@ -45,97 +53,104 @@
                     @csrf
                     <button type="submit"
                         class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition shadow">
-                        Cerrar sesión
+                        {{ __('Cerrar sesión') }}
                     </button>
                 </form>
                 @else
                 <a href="{{ route('login') }}"
                     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition shadow">
-                    Iniciar sesión
+                    {{ __('Iniciar sesión') }}
                 </a>
                 <a href="{{ route('register') }}"
                     class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition shadow">
-                    Registrarse
+                    {{ __('Registrarse') }}
                 </a>
                 @endauth
             </div>
         </div>
-
+        
         {{-- Botón para añadir nuevo libro (solo admin) --}}
         @auth
         @if(Auth::user()->esAdmin())
         <div class="flex justify-end mb-4">
             <a href="{{ route('libros.create') }}"
-                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                ➕ Añadir nuevo libro
+               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                ➕ {{ __('Añadir nuevo libro') }}
             </a>
         </div>
         @endif
         @endauth
+
         {{-- Buscador unificado por título o autor --}}
-<form method="GET" action="{{ route('libros.index') }}" class="mb-6 bg-white p-4 rounded shadow border border-gray-200">
-    <div class="flex items-center gap-4">
-        <input type="text" name="busqueda" placeholder="Buscar por título o autor" value="{{ request('busqueda') }}"
-            class="flex-grow px-4 py-2 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <form method="GET" action="{{ route('libros.index') }}" class="mb-6 bg-white p-4 rounded shadow border border-gray-200">
+            <div class="flex items-center gap-4">
+                <input type="text" name="busqueda" placeholder="{{ __('Buscar por título o autor') }}" value="{{ request('busqueda') }}"
+                    class="flex-grow px-4 py-2 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
 
-        <button type="submit"
-            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
-            Buscar
-        </button>
+                <button type="submit"
+                    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+                    {{ __('Buscar') }}
+                </button>
 
-        @if(request('busqueda'))
-        <a href="{{ route('libros.index') }}" class="text-red-600 underline text-sm hover:text-red-800">
-            Limpiar
-        </a>
-        @endif
-    </div>
-</form>
+                @if(request('busqueda'))
+                <a href="{{ route('libros.index') }}" class="text-red-600 underline text-sm hover:text-red-800">
+                    {{ __('Limpiar') }}
+                </a>
+                @endif
+            </div>
+        </form>
 
         {{-- Tabla de libros --}}
         <div class="bg-white shadow rounded-lg overflow-hidden border border-gray-200">
             <table class="w-full text-left table-auto">
                 <thead class="bg-[#1e3a8a] text-white">
                     <tr>
-                        <th class="py-3 px-4">Título</th>
-                        <th class="py-3 px-4">Autor</th>
-                        <th class="py-3 px-4">Estado</th>
-                        <th class="py-3 px-4 text-center">Acciones</th>
+                        <th class="py-3 px-4">{{ __('Título') }}</th>
+                        <th class="py-3 px-4">{{ __('Autor') }}</th>
+                        <th class="py-3 px-4">{{ __('Estado') }}</th>
+                        <th class="py-3 px-4 text-center">{{ __('Acciones') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($libros as $libro)
                     <tr class="border-t hover:bg-gray-50">
+                        {{-- Título del libro: nombre propio, lo dejamos tal cual --}}
                         <td class="py-3 px-4 font-medium">{{ $libro->titulo }}</td>
+
+                        {{-- Autor: NO traducir (nombre propio) --}}
                         <td class="py-3 px-4">{{ $libro->autor }}</td>
+
+                        {{-- Estado: etiqueta traducible en la interfaz --}}
                         <td class="py-3 px-4">
                             @if($libro->estado === 'disponible')
-                            <span class="text-green-600 font-semibold">Disponible</span>
+                                <span class="text-green-600 font-semibold">{{ __('Disponible') }}</span>
                             @elseif($libro->estado === 'prestado')
-                            <span class="text-red-600 font-semibold">Prestado</span>
+                                <span class="text-red-600 font-semibold">{{ __('Prestado') }}</span>
                             @else
-                            <span class="text-yellow-600 font-semibold">Reservado</span>
+                                <span class="text-yellow-600 font-semibold">{{ __('Reservado') }}</span>
                             @endif
                         </td>
+
                         <td class="py-3 px-4 text-center space-x-2">
                             {{-- Ver --}}
                             <a href="{{ route('libros.show', $libro->id) }}"
-                                class="bg-[#1e3a8a] text-white px-3 py-1 rounded text-sm hover:bg-[#3b82f6] transition">
-                                Ver
+                               class="bg-[#1e3a8a] text-white px-3 py-1 rounded text-sm hover:bg-[#3b82f6] transition">
+                                {{ __('Ver') }}
                             </a>
 
                             @auth
                             @if(Auth::user()->esAdmin())
                             {{-- Editar --}}
                             <a href="{{ route('libros.edit', $libro->id) }}"
-                                class="bg-yellow-500 text-white text-sm px-3 py-1 rounded hover:bg-yellow-600 transition">
-                                Editar
+                               class="bg-yellow-500 text-white text-sm px-3 py-1 rounded hover:bg-yellow-600 transition">
+                                {{ __('Editar') }}
                             </a>
 
                             {{-- Eliminar (abre modal) --}}
                             <button type="button"
-                                onclick="openModal({{ $libro->id }})"
-                                class="bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700 transition">
-                                Eliminar
+                                    onclick="openModal({{ $libro->id }})"
+                                    class="bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700 transition">
+                                {{ __('Eliminar') }}
                             </button>
                             @endif
                             @endauth
@@ -150,21 +165,21 @@
     {{-- Modal de confirmación --}}
     <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-lg p-6 w-full max-w-md border shadow-lg">
-            <h2 class="text-xl font-bold mb-4 text-center">¿Estás seguro?</h2>
-            <p class="mb-6 text-center">Esta acción eliminará el libro permanentemente.</p>
+            <h2 class="text-xl font-bold mb-4 text-center">{{ __('¿Estás seguro?') }}</h2>
+            <p class="mb-6 text-center">{{ __('Esta acción eliminará el libro permanentemente.') }}</p>
 
             <form id="deleteForm" method="POST">
                 @csrf
                 @method('DELETE')
                 <div class="flex justify-between">
                     <button type="button"
-                        onclick="closeModal()"
-                        class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
-                        Cancelar
+                            onclick="closeModal()"
+                            class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                        {{ __('Cancelar') }}
                     </button>
                     <button type="submit"
-                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                        Eliminar
+                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        {{ __('Eliminar') }}
                     </button>
                 </div>
             </form>

@@ -1,0 +1,22 @@
+{
+    "Cerrar sesión": "Log out",
+    "Iniciar sesión": "Log in",
+    "Registrarse": "Sign up",
+    "Añadir nuevo libro": "Add new book",
+    "Buscar por título o autor": "Search by title or author",
+    "Buscar": "Search",
+    "Limpiar": "Clear",
+    "Título": "Title",
+    "Autor": "Author",
+    "Estado": "Status",
+    "Acciones": "Actions",
+    "Disponible": "Available",
+    "Prestado": "Borrowed",
+    "Reservado": "Reserved",
+    "Ver": "View",
+    "Editar": "Edit",
+    "Eliminar": "Delete",
+    "¿Estás seguro?": "Are you sure?",
+    "Esta acción eliminará el libro permanentemente.": "This action will permanently delete the book.",
+    "Cancelar": "Cancel"
+}

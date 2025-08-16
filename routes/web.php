@@ -6,11 +6,15 @@ use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CuentaController; // ✅ Controlador nuevo para la vista de cuenta
+use App\Http\Controllers\CuentaController;
+use App\Http\Controllers\IdiomaController;
 use App\Http\Middleware\EsAdmin;
+
 
 // Página principal: lista de libros (acceso público)
 Route::get('/', [LibroController::class, 'index'])->name('libros.index');
+// Cambio de idioma (público, sin login)
+Route::post('/cambiar-idioma', [IdiomaController::class, 'cambiar'])->name('cambiar.idioma');
 
 // Ruta que espera Laravel Breeze tras el login (redirige al catálogo)
 Route::get('/dashboard', function () {
