@@ -114,13 +114,13 @@
                 <tbody>
                     @foreach($libros as $libro)
                     <tr class="border-t hover:bg-gray-50">
-                        {{-- Título del libro: nombre propio, lo dejamos tal cual --}}
-                        <td class="py-3 px-4 font-medium">{{ $libro->titulo }}</td>
+                        {{-- Título traducible --}}
+                        <td class="py-3 px-4 font-medium">{{ $libro->titulo_localizado }}</td>
 
                         {{-- Autor: NO traducir (nombre propio) --}}
                         <td class="py-3 px-4">{{ $libro->autor }}</td>
 
-                        {{-- Estado: etiqueta traducible en la interfaz --}}
+                        {{-- Estado traducible --}}
                         <td class="py-3 px-4">
                             @if($libro->estado === 'disponible')
                                 <span class="text-green-600 font-semibold">{{ __('Disponible') }}</span>

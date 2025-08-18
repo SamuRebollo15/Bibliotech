@@ -18,5 +18,17 @@
     "Eliminar": "Delete",
     "¿Estás seguro?": "Are you sure?",
     "Esta acción eliminará el libro permanentemente.": "This action will permanently delete the book.",
-    "Cancelar": "Cancel"
+    "Cancelar": "Cancel",
+
+    "Detalles": "Details",
+    "Detalles del libro": "Book details",
+    "Editorial": "Publisher",
+    "Año": "Year",
+    "Categoría": "Category",
+    "Sinopsis": "Synopsis",
+    "Volver al catálogo": "Back to catalog",
+    "Cuenta bloqueada": "Account blocked",
+    "Alquilar": "Borrow",
+    "No disponible": "Not available",
+    "Inicia sesión para alquilar": "Log in to borrow"
 }

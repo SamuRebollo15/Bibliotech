@@ -11,10 +11,21 @@ class Categoria extends Model
 
     protected $table = 'categorias';
 
-    protected $fillable = ['nombre'];
+    protected $fillable = [
+        'nombre',
+        'nombre_en', // nuevo
+    ];
 
     public function libros()
     {
         return $this->hasMany(Libro::class, 'categoria_id');
+    }
+
+    // Accessor para mostrar el nombre según idioma
+    public function getNombreLocalizadoAttribute(): string
+    {
+        return app()->getLocale() === 'en' && $this->nombre_en
+            ? $this->nombre_en
+            : $this->nombre;
     }
 }

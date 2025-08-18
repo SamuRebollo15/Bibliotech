@@ -12,7 +12,7 @@ class UsuarioSeeder extends Seeder
     {
         DB::table('users')->insert([
             ['name' => 'Laura Pérez', 'email' => 'laura@example.com', 'password' => Hash::make('password'), 'rol' => 'lector'],
-            ['name' => 'Carlos Ruiz', 'email' => 'carlos@example.com', 'password' => Hash::make('password'), 'rol' => 'admin'],
+            ['name' => 'Carlos Ruiz', 'email' => 'carlos@example.com', 'password' => Hash::make('password'), 'rol' => 'lector'],
             ['name' => 'Ana Gómez', 'email' => 'ana@example.com', 'password' => Hash::make('password'), 'rol' => 'lector'],
             ['name' => 'Pedro Sánchez', 'email' => 'pedro@example.com', 'password' => Hash::make('password'), 'rol' => 'lector'],
             ['name' => 'Marta Díaz', 'email' => 'marta@example.com', 'password' => Hash::make('password'), 'rol' => 'lector'],

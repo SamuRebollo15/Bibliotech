@@ -18,5 +18,17 @@
     "Eliminar": "Eliminar",
     "¿Estás seguro?": "¿Estás seguro?",
     "Esta acción eliminará el libro permanentemente.": "Esta acción eliminará el libro permanentemente.",
-    "Cancelar": "Cancelar"
+    "Cancelar": "Cancelar",
+
+    "Detalles": "Detalles",
+    "Detalles del libro": "Detalles del libro",
+    "Editorial": "Editorial",
+    "Año": "Año",
+    "Categoría": "Categoría",
+    "Sinopsis": "Sinopsis",
+    "Volver al catálogo": "Volver al catálogo",
+    "Cuenta bloqueada": "Cuenta bloqueada",
+    "Alquilar": "Alquilar",
+    "No disponible": "No disponible",
+    "Inicia sesión para alquilar": "Inicia sesión para alquilar"
 }
