@@ -19,7 +19,9 @@ class PrestamoController extends Controller
             ->map(function ($prestamo) {
                 $inicio = Carbon::parse($prestamo->fecha_inicio);
                 $fin = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
-                $maximaFecha = $inicio->copy()->addDays(14); // 7 originales + 7 prórroga
+
+                // Máximo = 25 inicial + 25 prórroga
+                $maximaFecha = $inicio->copy()->addDays(50);
                 $prestamo->ya_prorrogado = $fin && $fin->greaterThanOrEqualTo($maximaFecha);
                 return $prestamo;
             });
@@ -41,20 +43,21 @@ class PrestamoController extends Controller
         $libro = Libro::findOrFail($request->libro_id);
 
         if ($libro->estado !== 'disponible') {
-            return redirect()->back()->with('error', 'Este libro no está disponible.');
+            return redirect()->back()->with('error', __('Este libro no está disponible.'));
         }
 
         Prestamo::create([
-            'user_id' => Auth::id(),
-            'libro_id' => $libro->id,
+            'user_id'      => Auth::id(),
+            'libro_id'     => $libro->id,
             'fecha_inicio' => now(),
-            'fecha_fin' => now()->addDays(7),
-            'estado' => 'activo',
+            'fecha_fin'    => now()->addDays(25),
+            'estado'       => 'activo',
         ]);
 
         $libro->update(['estado' => 'prestado']);
 
-        return redirect()->route('prestamos.index')->with('success', 'Préstamo registrado correctamente.');
+        return redirect()->route('prestamos.index')
+            ->with('success', __('El préstamo ha sido registrado correctamente.'));
     }
 
     public function gestion(Request $request)
@@ -73,7 +76,7 @@ class PrestamoController extends Controller
         $prestamosActivos = (clone $query)->where('estado', 'activo')->get()->map(function ($prestamo) {
             $inicio = Carbon::parse($prestamo->fecha_inicio);
             $fin = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
-            $maximaFecha = $inicio->copy()->addDays(14);
+            $maximaFecha = $inicio->copy()->addDays(50);
             $prestamo->ya_prorrogado = $fin && $fin->greaterThanOrEqualTo($maximaFecha);
             return $prestamo;
         });
@@ -108,7 +111,8 @@ class PrestamoController extends Controller
 
         $prestamo->save();
 
-        return redirect()->route('admin.prestamos.gestion')->with('success', 'Estado del préstamo actualizado.');
+        return redirect()->route('admin.prestamos.gestion')
+            ->with('success', __('Estado del préstamo actualizado.'));
     }
 
     public function show(Prestamo $prestamo)
@@ -133,12 +137,13 @@ class PrestamoController extends Controller
 
         $prestamo->update([
             'fecha_fin' => now(),
-            'estado' => 'devuelto',
+            'estado'    => 'devuelto',
         ]);
 
         $prestamo->libro->update(['estado' => 'disponible']);
 
-        return redirect()->route('prestamos.index')->with('success', 'Libro devuelto correctamente.');
+        return redirect()->route('prestamos.index')
+            ->with('success', __('Libro devuelto correctamente.'));
     }
 
     public function destroy(Prestamo $prestamo)
@@ -153,21 +158,24 @@ class PrestamoController extends Controller
 
         $prestamo->delete();
 
-        return redirect()->route('prestamos.index')->with('success', 'Préstamo cancelado correctamente.');
+        return redirect()->route('prestamos.index')
+            ->with('success', __('Préstamo cancelado correctamente.'));
     }
 
     public function formulario(Libro $libro)
     {
         if (Auth::user()->bloqueado) {
-            return redirect()->route('libros.index')->with('error', 'No puedes solicitar préstamos porque tu cuenta está bloqueada.');
+            return redirect()->route('libros.index')
+                ->with('error', __('No puedes solicitar préstamos porque tu cuenta está bloqueada.'));
         }
 
         if ($libro->estado !== 'disponible') {
-            return redirect()->route('libros.index')->with('error', 'Este libro no está disponible para préstamo.');
+            return redirect()->route('libros.index')
+                ->with('error', __('Este libro no está disponible para préstamo.'));
         }
 
-        $fechaRecogida = Carbon::today();
-        $fechaDevolucion = $fechaRecogida->copy()->addDays(7);
+        $fechaRecogida  = Carbon::today();
+        $fechaDevolucion = $fechaRecogida->copy()->addDays(25);
 
         return view('prestamos.formulario', compact('libro', 'fechaRecogida', 'fechaDevolucion'));
     }
@@ -175,7 +183,8 @@ class PrestamoController extends Controller
     public function realizar(Request $request, Libro $libro)
     {
         if (Auth::user()->bloqueado) {
-            return redirect()->route('libros.index')->with('error', 'No puedes alquilar libros porque tu cuenta está bloqueada.');
+            return redirect()->route('libros.index')
+                ->with('error', __('No puedes alquilar libros porque tu cuenta está bloqueada.'));
         }
 
         $request->validate([
@@ -183,45 +192,50 @@ class PrestamoController extends Controller
         ]);
 
         if ($libro->estado !== 'disponible') {
-            return redirect()->route('libros.index')->with('error', 'Este libro no está disponible.');
+            return redirect()->route('libros.index')
+                ->with('error', __('Este libro no está disponible.'));
         }
 
         $fechaInicio = Carbon::parse($request->fecha_inicio);
-        $fechaFin = $fechaInicio->copy()->addDays(7);
+        $fechaFin    = $fechaInicio->copy()->addDays(25);
 
         Prestamo::create([
-            'user_id' => Auth::id(),
-            'libro_id' => $libro->id,
+            'user_id'      => Auth::id(),
+            'libro_id'     => $libro->id,
             'fecha_inicio' => $fechaInicio,
-            'fecha_fin' => $fechaFin,
-            'estado' => 'activo',
+            'fecha_fin'    => $fechaFin,
+            'estado'       => 'activo',
         ]);
 
         $libro->update(['estado' => 'prestado']);
 
-        return redirect()->route('libros.index')->with('success', 'El préstamo ha sido registrado correctamente.');
+        return redirect()->route('libros.index')
+            ->with('success', __('El préstamo ha sido registrado correctamente.'));
     }
 
     public function prorrogar(Prestamo $prestamo)
-    {
-        if ($prestamo->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $inicio = Carbon::parse($prestamo->fecha_inicio);
-        $fin = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
-        $maximaFecha = $inicio->copy()->addDays(14);
-
-        if ($fin && $fin->greaterThanOrEqualTo($maximaFecha)) {
-            return back()->with('error', 'No puedes prorrogar este préstamo más de una vez.');
-        }
-
-        $prestamo->fecha_fin = $fin
-            ? $fin->copy()->addDays(7)
-            : $inicio->copy()->addDays(7);
-
-        $prestamo->save();
-
-        return back()->with('success', 'Préstamo prorrogado correctamente por 7 días.');
+{
+    if ($prestamo->user_id !== Auth::id()) {
+        abort(403);
     }
+
+    $inicio = Carbon::parse($prestamo->fecha_inicio);
+    $fin    = $prestamo->fecha_fin ? Carbon::parse($prestamo->fecha_fin) : null;
+
+    // Máximo = inicio + 32 días (25 inicial + 7 prórroga)
+    $maximaFecha = $inicio->copy()->addDays(32);
+
+    if ($fin && $fin->greaterThanOrEqualTo($maximaFecha)) {
+        return back()->with('error', __('No puedes prorrogar este préstamo más de una vez.'));
+    }
+
+    $prestamo->fecha_fin = $fin
+        ? $fin->copy()->addDays(7)   // +7 días
+        : $inicio->copy()->addDays(7);
+
+    $prestamo->save();
+
+    return back()->with('success', __('Préstamo prorrogado correctamente por :days días.', ['days' => 7]));
+}
+
 }
