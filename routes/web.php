@@ -11,6 +11,9 @@ use App\Http\Controllers\IdiomaController;
 use App\Http\Middleware\EsAdmin;
 
 
+//Ruta para cambiar el tema 
+Route::post('/tema-toggle', function () { $current = session('theme', 'light');session(['theme' => $current === 'dark' ? 'light' : 'dark']);return back();})->name('tema.toggle');
+
 // Página principal: lista de libros (acceso público)
 Route::get('/', [LibroController::class, 'index'])->name('libros.index');
 // Cambio de idioma (público, sin login)

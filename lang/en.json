@@ -98,5 +98,9 @@
     "devuelto": "Returned",
     "Libro creado correctamente.": "Book created successfully.",
   "Libro actualizado correctamente.": "Book updated successfully.",
-  "Libro eliminado correctamente.": "Book deleted successfully."
+  "Libro eliminado correctamente.": "Book deleted successfully.",
+  "Tema oscuro": "Dark theme",
+  "Tema claro": "Light theme"
+
+
 }
