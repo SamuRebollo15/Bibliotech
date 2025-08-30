@@ -83,7 +83,7 @@
                                         @method('PATCH')
                                         <button type="submit"
                                             class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm transition">
-                                            {{ __('Prorrogar +25 días') }}
+                                            {{ __('Prorrogar +7 días') }}
                                         </button>
                                     </form>
                                 @else

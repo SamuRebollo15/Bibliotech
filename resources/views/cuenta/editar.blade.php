@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" class="{{ session('theme','light') === 'dark' ? 'dark' : '' }}">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ __('Editar perfil') }} | Bibliotech</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script> tailwind.config = { darkMode: 'class' } </script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
 </head>
 
 <body class="font-sans bg-[#e6f0f4] text-gray-800 dark:bg-slate-900 dark:text-slate-100">
@@ -15,7 +20,7 @@
             <form method="POST" action="{{ route('cambiar.idioma') }}">
                 @csrf
                 <button type="submit"
-                        class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-800
+                    class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-800
                                dark:bg-gray-700 dark:text-slate-100 dark:hover:bg-gray-600 transition">
                     🌐 {{ app()->getLocale() === 'es' ? 'English' : 'Español' }}
                 </button>
@@ -24,12 +29,12 @@
             <form method="POST" action="{{ route('tema.toggle') }}">
                 @csrf
                 <button type="submit"
-                        class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-800
+                    class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 text-gray-800
                                dark:bg-gray-700 dark:text-slate-100 dark:hover:bg-gray-600 transition">
                     @if(session('theme','light') === 'dark')
-                        ☀️ {{ __('Tema claro') }}
+                    ☀️ {{ __('Tema claro') }}
                     @else
-                        🌙 {{ __('Tema oscuro') }}
+                    🌙 {{ __('Tema oscuro') }}
                     @endif
                 </button>
             </form>
@@ -41,24 +46,25 @@
 
         {{-- Mensajes --}}
         @if (session('status'))
-            <div class="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 p-4 rounded mb-6">
-                {{ session('status') }}
-            </div>
+        <div class="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 p-4 rounded mb-6">
+            {{ __(session('status')) }}
+        </div>
         @endif
+
 
         {{-- Errores --}}
         @if ($errors->any())
-            <div class="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 p-4 rounded mb-6">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 p-4 rounded mb-6">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
         @endif
 
         <form method="POST" action="{{ route('profile.update') }}"
-              class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded p-6">
+            class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded p-6">
             @csrf
             @method('PATCH')
 
@@ -94,15 +100,16 @@
 
             <div class="flex justify-between">
                 <a href="{{ route('cuenta.index') }}"
-                   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition">
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition">
                     {{ __('Volver') }}
                 </a>
                 <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
                     {{ __('Guardar cambios') }}
                 </button>
             </div>
         </form>
     </div>
 </body>
+
 </html>
