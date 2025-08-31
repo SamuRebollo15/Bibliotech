@@ -101,7 +101,11 @@
   "Libro eliminado correctamente.": "Book deleted successfully.",
   "Tema oscuro": "Dark theme",
   "Tema claro": "Light theme",
-  "Perfil actualizado correctamente.": "Profile updated successfully."
+  "Perfil actualizado correctamente.": "Profile updated successfully.",
+"Usuario bloqueado correctamente.": "User blocked successfully.",
+"Usuario desbloqueado correctamente.": "User unblocked successfully.",
+"Préstamo actualizado correctamente.": "Loan updated successfully."
+
 
 
 }

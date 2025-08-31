@@ -10,6 +10,7 @@
 <body class="bg-gray-100 dark:bg-slate-900 text-gray-800 dark:text-slate-100 font-sans">
 
 <div class="max-w-7xl mx-auto px-6 py-8">
+
     {{-- Controles (idioma/tema) --}}
     <div class="flex justify-end gap-2 mb-4">
         <form method="POST" action="{{ route('cambiar.idioma') }}">
@@ -34,13 +35,20 @@
         </form>
     </div>
 
-    <h1 class="text-3xl font-bold text-blue-800 dark:text-blue-300 mb-6 text-center">📚 {{ __('Gestión de Préstamos') }}</h1>
+    {{-- Título --}}
+    <h1 class="text-3xl font-bold text-blue-800 dark:text-blue-300 mb-6 text-center">
+        📚 {{ __('Gestión de Préstamos') }}
+    </h1>
 
     {{-- Mensajes --}}
     @if(session('success'))
-        <div class="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200 p-4 rounded mb-6">{{ session('success') }}</div>
+        <div class="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200 p-4 rounded mb-6">
+            {{ __(session('success')) }}
+        </div>
     @elseif(session('error'))
-        <div class="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200 p-4 rounded mb-6">{{ session('error') }}</div>
+        <div class="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200 p-4 rounded mb-6">
+            {{ __(session('error')) }}
+        </div>
     @endif
 
     {{-- Filtro por usuario --}}
@@ -60,7 +68,7 @@
                 </select>
             </form>
 
-            {{-- Botón bloquear/desbloquear solo si hay usuario seleccionado --}}
+            {{-- Botón bloquear/desbloquear --}}
             @if($usuarioId)
                 @php
                     $usuarioSeleccionado = $usuarios->firstWhere('id', $usuarioId);
@@ -69,16 +77,14 @@
                     @if($usuarioSeleccionado->bloqueado)
                         <form method="POST" action="{{ route('admin.usuarios.desbloquear', $usuarioSeleccionado->id) }}">
                             @csrf @method('PATCH')
-                            <button type="submit"
-                                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                            <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
                                 {{ __('Desbloquear') }}
                             </button>
                         </form>
                     @else
                         <form method="POST" action="{{ route('admin.usuarios.bloquear', $usuarioSeleccionado->id) }}">
                             @csrf @method('PATCH')
-                            <button type="submit"
-                                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                                 {{ __('Bloquear') }}
                             </button>
                         </form>
@@ -93,39 +99,43 @@
     <div class="bg-white dark:bg-slate-800 rounded shadow overflow-x-auto mb-8 border border-gray-200 dark:border-slate-700">
         <table class="w-full table-auto border-collapse">
             <thead class="bg-blue-800 text-white dark:bg-blue-900">
-            <tr>
-                <th class="py-3 px-4 text-left">{{ __('Usuario') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Libro') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Inicio') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Fin') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Estado') }}</th>
-                <th class="py-3 px-4 text-center">{{ __('Acciones') }}</th>
-            </tr>
+                <tr>
+                    <th class="py-3 px-4 text-left">{{ __('Usuario') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Libro') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Inicio') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Fin') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Estado') }}</th>
+                    <th class="py-3 px-4 text-center">{{ __('Acciones') }}</th>
+                </tr>
             </thead>
             <tbody>
-            @forelse($prestamosActivos as $prestamo)
-                <tr class="border-b border-gray-200 dark:border-slate-700">
-                    <td class="py-3 px-4">{{ $prestamo->usuario->name }}</td>
-                    <td class="py-3 px-4">{{ $prestamo->libro->titulo_localizado }}</td>
-                    <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_inicio)->format('d/m/Y') }}</td>
-                    <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_fin)->format('d/m/Y') }}</td>
-                    <td class="py-3 px-4 text-blue-700 dark:text-blue-300 font-semibold capitalize">{{ ucfirst(__($prestamo->estado)) }}</td>
-                    <td class="py-3 px-4 text-center">
-                        <form action="{{ route('admin.prestamos.actualizar', $prestamo->id) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <input type="hidden" name="estado" value="devuelto">
-                            <button type="submit"
-                                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm transition">
-                                {{ __('Marcar como devuelto') }}
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center py-4 text-gray-500 dark:text-slate-400">{{ __('No hay préstamos activos.') }}</td>
-                </tr>
-            @endforelse
+                @forelse($prestamosActivos as $prestamo)
+                    <tr class="border-b border-gray-200 dark:border-slate-700">
+                        <td class="py-3 px-4">{{ $prestamo->usuario->name }}</td>
+                        <td class="py-3 px-4">{{ $prestamo->libro->titulo_localizado }}</td>
+                        <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_inicio)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_fin)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-4 text-blue-700 dark:text-blue-300 font-semibold capitalize">
+                            {{ __($prestamo->estado) }}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <form action="{{ route('admin.prestamos.actualizar', $prestamo->id) }}" method="POST">
+                                @csrf @method('PATCH')
+                                <input type="hidden" name="estado" value="devuelto">
+                                <button type="submit"
+                                        class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm transition">
+                                    {{ __('Marcar como devuelto') }}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-gray-500 dark:text-slate-400">
+                            {{ __('No hay préstamos activos.') }}
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -135,28 +145,30 @@
     <div class="bg-white dark:bg-slate-800 rounded shadow overflow-x-auto border border-gray-200 dark:border-slate-700">
         <table class="w-full table-auto border-collapse">
             <thead class="bg-gray-700 text-white dark:bg-gray-800">
-            <tr>
-                <th class="py-3 px-4 text-left">{{ __('Usuario') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Libro') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Inicio') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Fin') }}</th>
-                <th class="py-3 px-4 text-left">{{ __('Estado') }}</th>
-            </tr>
+                <tr>
+                    <th class="py-3 px-4 text-left">{{ __('Usuario') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Libro') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Inicio') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Fin') }}</th>
+                    <th class="py-3 px-4 text-left">{{ __('Estado') }}</th>
+                </tr>
             </thead>
             <tbody>
-            @forelse($prestamosDevueltos as $prestamo)
-                <tr class="border-b border-gray-200 dark:border-slate-700">
-                    <td class="py-3 px-4">{{ $prestamo->usuario->name }}</td>
-                    <td class="py-3 px-4">{{ $prestamo->libro->titulo_localizado }}</td>
-                    <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_inicio)->format('d/m/Y') }}</td>
-                    <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_fin)->format('d/m/Y') }}</td>
-                    <td class="py-3 px-4 text-gray-700 dark:text-slate-300 capitalize">{{ ucfirst(__($prestamo->estado)) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center py-4 text-gray-500 dark:text-slate-400">{{ __('No hay préstamos devueltos.') }}</td>
-                </tr>
-            @endforelse
+                @forelse($prestamosDevueltos as $prestamo)
+                    <tr class="border-b border-gray-200 dark:border-slate-700">
+                        <td class="py-3 px-4">{{ $prestamo->usuario->name }}</td>
+                        <td class="py-3 px-4">{{ $prestamo->libro->titulo_localizado }}</td>
+                        <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_inicio)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-4">{{ \Carbon\Carbon::parse($prestamo->fecha_fin)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-4 text-gray-700 dark:text-slate-300 capitalize">{{ __($prestamo->estado) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-gray-500 dark:text-slate-400">
+                            {{ __('No hay préstamos devueltos.') }}
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

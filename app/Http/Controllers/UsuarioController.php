@@ -96,7 +96,7 @@ class UsuarioController extends Controller
     $user->bloqueado = true;
     $user->save();
 
-    return back()->with('success', 'Usuario bloqueado correctamente.');
+    return redirect()->back()->with('success', __('Usuario bloqueado correctamente.'));
 }
 
 
@@ -108,7 +108,7 @@ class UsuarioController extends Controller
     $user->bloqueado = false;
     $user->save();
 
-    return back()->with('success', 'Usuario desbloqueado correctamente.');
+    return redirect()->back()->with('success', __('Usuario desbloqueado correctamente.'));
 }
 
 }
